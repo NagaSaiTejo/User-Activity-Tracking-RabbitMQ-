@@ -1,10 +1,5 @@
 # Event-Driven User Activity Tracking Service
 
-[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)](https://www.rabbitmq.com/)
-[![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-
 ## 📝 Overview
 A robust, distributed backend system for high-throughput tracking of user activities (login, logout, page views). This architecture utilizes **RabbitMQ** to decouple the API entry point from the persistence layer, ensuring system resilience and scalability.
 

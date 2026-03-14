@@ -1,9 +1,9 @@
 # Event-Driven User Activity Tracking Service
 
-## 📝 Overview
+## Overview
 A robust, distributed backend system for high-throughput tracking of user activities (login, logout, page views). This architecture utilizes **RabbitMQ** to decouple the API entry point from the persistence layer, ensuring system resilience and scalability.
 
-## 🏗️ Architecture
+## Architecture
 The system is composed of four containerized components:
 
 1.  **Producer Service (FastAPI):** Validates incoming `UserActivityEvent` payloads and publishes them to the queue. Returns `202 Accepted` to minimize client-side latency.
@@ -13,7 +13,7 @@ The system is composed of four containerized components:
 
 ---
 
-## 🚀 Setup and Installation
+## Setup and Installation
 
 ### Prerequisites
 - [Docker & Docker Compose](https://docs.docker.com/get-docker/)
@@ -37,7 +37,7 @@ Verify that all services are operational and connected:
 
 ---
 
-## 📡 API Usage
+## API Usage
 
 ### Track Activity
 `POST /api/v1/events/track`
@@ -62,7 +62,7 @@ Verify that all services are operational and connected:
 
 ---
 
-## 🧪 Testing and Validation
+## Testing and Validation
 
 ### Automated Suites
 Execute unit and integration tests inside the running containers:
@@ -82,7 +82,7 @@ docker-compose exec mysql mysql -uroot -proot_password user_activity_db -e "SELE
 
 ---
 
-## 🛠️ Technical Implementation Details
+## Technical Implementation Details
 
 - **Decoupling:** The Producer never interacts with the database, protecting the API from DB latency or outages.
 - **Reliability:** Messages are set to `delivery_mode=2` (persistent) and queues are `durable`. Consumers use manual ACKs to ensure no message is lost.
@@ -91,5 +91,5 @@ docker-compose exec mysql mysql -uroot -proot_password user_activity_db -e "SELE
 
 ---
 
-## 👨‍💼 Business Impact (Stakeholder Summary)
+## Business Impact (Stakeholder Summary)
 By moving from a synchronous to an **Event-Driven Architecture**, we eliminate the risk of database performance impacting the end-user experience. This system acts as a high-capacity "buffer," allowing the application to handle massive traffic spikes without data loss or service degradation. It is a future-proof foundation for real-time analytics and auditing.

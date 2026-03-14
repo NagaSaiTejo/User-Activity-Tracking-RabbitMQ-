@@ -32,7 +32,7 @@ def test_track_event_success(mock_publish):
 def test_track_event_invalid_payload():
     response = client.post("/api/v1/events/track", json=invalid_payload)
     
-    assert response.status_code == 422 # FastAPI validation error is 422 default
+    assert response.status_code == 400 # Requirement says 400 Bad Request
     # The requirement says to return 400 for invalid. I will check the requirements.
     # Ah, the requirement explicitly says POST /api/v1/events/track endpoint MUST return an HTTP 400 Bad Request status code.
     # Pydantic validation by default returns 422. I need to override the exception handler.

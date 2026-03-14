@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
+from contextlib import asynccontextmanager
 from typing import Any
 import logging
 
@@ -10,7 +11,22 @@ from src.rabbitmq import publisher
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Event-Driven User Activity Tracking API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup logic
+    try:
+        publisher.connect()
+        logger.info("Successfully connected to RabbitMQ on startup")
+    except Exception as e:
+        logger.error(f"Error connecting to RabbitMQ on startup: {e}")
+    
+    yield
+    
+    # Shutdown logic
+    publisher.close()
+    logger.info("RabbitMQ connection closed on shutdown")
+
+app = FastAPI(title="Event-Driven User Activity Tracking API", lifespan=lifespan)
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -18,17 +34,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         status_code=status.HTTP_400_BAD_REQUEST,
         content={"detail": exc.errors(), "body": exc.body},
     )
-
-@app.on_event("startup")
-def startup_event():
-    try:
-        publisher.connect()
-    except Exception as e:
-        logger.error(f"Error connecting to RabbitMQ on startup: {e}")
-
-@app.on_event("shutdown")
-def shutdown_event():
-    publisher.close()
 
 @app.post("/api/v1/events/track", status_code=status.HTTP_202_ACCEPTED)
 async def track_event(event: UserActivityEvent) -> Any:

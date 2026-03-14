@@ -1,0 +1,20 @@
+# Environment variables
+.env
+
+# Python build/cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Large media files (Recordings)
+Youtube submission/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project-specific exclusions (internal docs)
+.gemini/
+implementation_plan.md
+walkthrough.md
+task.md

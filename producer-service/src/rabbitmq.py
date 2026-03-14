@@ -42,25 +42,31 @@ class RabbitMQPublisher:
                     raise
 
     def publish_event(self, event_data: dict):
-        if not self.connection or self.connection.is_closed:
-            self.connect()
+        # Try to publish, reconnect if necessary
+        for attempt in range(2):
+            try:
+                if not self.connection or self.connection.is_closed or not self.channel or self.channel.is_closed:
+                    self.connect()
 
-        try:
-            self.channel.basic_publish(
-                exchange='',
-                routing_key=QUEUE_NAME,
-                body=json.dumps(event_data),
-                properties=pika.BasicProperties(
-                    delivery_mode=2,  # make message persistent
-                    content_type='application/json'
+                self.channel.basic_publish(
+                    exchange='',
+                    routing_key=QUEUE_NAME,
+                    body=json.dumps(event_data),
+                    properties=pika.BasicProperties(
+                        delivery_mode=2,  # make message persistent
+                        content_type='application/json'
+                    )
                 )
-            )
-            return True
-        except Exception as e:
-            logger.error(f"Failed to publish message: {e}")
-            if self.connection and not self.connection.is_closed:
-                self.connection.close()
-            raise
+                return True
+            except (pika.exceptions.AMQPConnectionError, pika.exceptions.StreamLostError) as e:
+                logger.warning(f"Connection lost during publish (attempt {attempt+1}): {e}")
+                if attempt == 0:
+                    self.connect() # Reconnect for next attempt
+                else:
+                    raise
+            except Exception as e:
+                logger.error(f"Failed to publish message: {e}")
+                raise
 
     def close(self):
         if self.connection and not self.connection.is_closed:
